@@ -9,6 +9,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import com.github.mikephil.charting.charts.LineChart;
 
 
 /**
@@ -28,6 +31,8 @@ public class RunningFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private LineChart chart;
 
     private OnFragmentInteractionListener mListener;
 
@@ -65,6 +70,11 @@ public class RunningFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // initialize chart
+        chart = container.findViewById(R.id.fragment_run_chart);
+        fillChart();
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_running, container, false);
     }
@@ -106,5 +116,9 @@ public class RunningFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void fillChart() {
+        // slkdf
     }
 }
