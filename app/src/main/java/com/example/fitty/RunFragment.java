@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,19 +35,22 @@ public class RunFragment extends Fragment implements OnMapReadyCallback {
 
     private MapView mapView;
 
-    public static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private Button startBtn;
+    private Button stopBtn;
+    private Button pauseBtn;
+
+    private ConstraintLayout startLayout;
+    private ConstraintLayout runLayout;
+
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+
+    private boolean runActive;
 
 
     public RunFragment() {
-        // Required empty public constructor
+        this.runActive = false;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment RunFragment.
-     */
     public static RunFragment newInstance(String param1, String param2) {
         RunFragment fragment = new RunFragment();
         return fragment;
@@ -59,9 +64,43 @@ public class RunFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_run, container, false);
+
         mapView = view.findViewById(R.id.fragment_run_map);
+
+        startBtn = view.findViewById(R.id.fragment_run_btn_start);
+        stopBtn = view.findViewById(R.id.fragment_run_btn_stop);
+        pauseBtn = view.findViewById(R.id.fragment_run_btn_pause);
+
+        startLayout = view.findViewById(R.id.fragment_run_con_start);
+        runLayout = view.findViewById(R.id.fragment_run_con_run);
+
+        startBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (! RunFragment.this.runActive) {
+                    RunFragment.this.runActive = true;
+                    startLayout.setVisibility(View.INVISIBLE);
+                    runLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        pauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //
+            }
+        });
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (RunFragment.this.runActive) {
+                    RunFragment.this.runActive = false;
+                    startLayout.setVisibility(View.VISIBLE);
+                    runLayout.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         initGoogleMap(savedInstanceState);
 
