@@ -22,10 +22,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences preferences = this.getSharedPreferences("ACCOUNT_PREFERENCES", MODE_PRIVATE);
-        if (! preferences.getBoolean("FIRST_TIME", false)) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-        }
+//        if (! preferences.getBoolean("FIRST_TIME", false)) {
+//            Intent intent = new Intent(this, LoginActivity.class);
+//            startActivity(intent);
+//        }
 
 
         BottomNavigationView bottomNav = findViewById(R.id.navbar_bottom);
