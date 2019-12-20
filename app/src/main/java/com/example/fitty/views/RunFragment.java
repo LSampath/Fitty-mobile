@@ -1,27 +1,23 @@
-package com.example.fitty;
+package com.example.fitty.views;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.example.fitty.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
 
 
 /**
@@ -51,7 +47,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback {
         this.runActive = false;
     }
 
-    public static RunFragment newInstance(String param1, String param2) {
+    public static RunFragment newInstance() {
         RunFragment fragment = new RunFragment();
         return fragment;
     }
