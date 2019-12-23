@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fitty.R;
@@ -35,7 +36,9 @@ import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.maps.model.SquareCap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,32 +54,46 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private MapView mapView;
     private LocationManager locationManager;
+    private GoogleMap googleMap;
     private Button startBtn;
     private Button stopBtn;
     private Button pauseBtn;
+    private TextView distance_val, time_val, speed_val;
 
     private ConstraintLayout startLayout;
     private ConstraintLayout runLayout;
 
+    // Polyline Styling
     private static final int COLOR_BLACK_ARGB = 0xff000000;
     private static final int COLOR_WHITE_ARGB = 0xffffffff;
     private static final int COLOR_GREEN_ARGB = 0xff388E3C;
-    private static final int COLOR_PURPLE_ARGB = 0xff81C784;
+    private static final int COLOR_PURPLE_ARGB = 0xffb32bed;
     private static final int COLOR_ORANGE_ARGB = 0xffF57F17;
     private static final int COLOR_BLUE_ARGB = 0xffF9A825;
     private static final int PATTERN_DASH_LENGTH_PX = 20;
-
     private static final PatternItem DASH = new Dash(PATTERN_DASH_LENGTH_PX);
-
     private static final int POLYLINE_STROKE_WIDTH_PX = 5;
     private static final int PATTERN_GAP_LENGTH_PX = 20;
     private static final PatternItem DOT = new Dot();
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
+    private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
-    private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
-    private boolean runActive;
 
+    private boolean runActive;
+    private Polyline polyline;
+
+    private boolean isGPSEnabled;
+    private boolean isNetworkEnabled;
+
+    private ArrayList<LatLng> arrayList;
+    private ArrayList<LatLng> temp;
+    private LatLng initialPosition;
+    private boolean initialPositionChecked = false;
+
+    private int i;
+    private int j;
+    private double distance = 0;
 
     public RunFragment() {
         this.runActive = false;
@@ -97,13 +114,26 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        //getting GPS status
+        isGPSEnabled = locationManager
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        // getting network status
+        isNetworkEnabled = locationManager
+                .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
         View view = inflater.inflate(R.layout.fragment_run, container, false);
 
-        mapView = (MapView) view.findViewById(R.id.fragment_run_map);
+        mapView = view.findViewById(R.id.fragment_run_map);
 
         startBtn = view.findViewById(R.id.fragment_run_btn_start);
         stopBtn = view.findViewById(R.id.fragment_run_btn_stop);
         pauseBtn = view.findViewById(R.id.fragment_run_btn_pause);
+        distance_val = view.findViewById(R.id.fragment_run_tv_distance);
+        time_val = view.findViewById(R.id.fragment_run_tv_time);
+        speed_val = view.findViewById(R.id.fragment_run_tv_speed);
 
         startLayout = view.findViewById(R.id.fragment_run_con_start);
         runLayout = view.findViewById(R.id.fragment_run_con_run);
@@ -115,6 +145,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     RunFragment.this.runActive = true;
                     startLayout.setVisibility(View.INVISIBLE);
                     runLayout.setVisibility(View.VISIBLE);
+                    resetText();
                 }
             }
         });
@@ -137,6 +168,11 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         initGoogleMap(savedInstanceState);
 
+        i = 0;
+        j = 0;
+        temp = new ArrayList<>();
+        arrayList = new ArrayList<>();
+
         return view;
     }
 
@@ -152,31 +188,39 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
+            // Request Permission
+            requestPermissions(
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+
             return;
         }
-//        googleMap.setMyLocationEnabled(true);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
-//        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    Activity#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for Activity#requestPermissions for more details.
-//            return;
-//        }
 
+        if(isNetworkEnabled){
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1 , this);
+        }
+        if(isGPSEnabled){
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+        }
+
+        checkStatus();
+    }
+
+    private void checkStatus() {
+        if(!isGPSEnabled){
+            distance_val.setText("GPS offline");
+            speed_val.setText("GPS offline");
+        }
+        else{
+            distance_val.setText("Checking");
+            speed_val.setText("Checking");
+        }
+    }
+
+    public void resetText(){
+        distance_val.setText("0 KM");
+        time_val.setText("0 Min 0 Sec");
+        speed_val.setText("0 KMPH");
     }
 
     @Override
@@ -220,11 +264,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapView.onStop();
     }
 
-//    @Override
-//    public void onMapReady(GoogleMap map) {
-//        map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-//    }
-
     @Override
     public void onPause() {
         mapView.onPause();
@@ -252,12 +291,53 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
             polyline.setPattern(null);
         }
 
-//        Toast.makeText(this, "Route type " + polyline.getTag().toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Route Track " + polyline.getTag().toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public synchronized void onLocationChanged(Location location) {
+        if (i>0 && !initialPositionChecked){
+            initialPosition = new LatLng(location.getLatitude(),location.getLongitude());
+            googleMap.addMarker(new MarkerOptions().position(new LatLng(initialPosition.latitude, initialPosition.longitude)).title("Starting Point"));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(initialPosition.latitude, initialPosition.longitude), 15));
+            initialPositionChecked = true;
+            arrayList.add(initialPosition);
+        } else if(i<1){
+            i = i + 1;
+        } else {
+            double avg_lat = 0;
+            double avg_lon = 0;
+            j = j + 1;
+            temp.add(new LatLng(location.getLatitude(),location.getLongitude()));
+            speed_val.setText(Integer.toString(j));
+            if(j==10){
+                for (LatLng latLng: temp){
+                    avg_lat = avg_lat + latLng.latitude;
+                    avg_lon = avg_lon + latLng.longitude;
+                }
+                avg_lat = avg_lat/temp.size();
+                avg_lon = avg_lon/temp.size();
+                LatLng newPoint = new LatLng(avg_lat,avg_lon);
+                temp.clear();
+                distance = distance + round(harversineDistance(arrayList.get(arrayList.size()-1),newPoint),2);
+                arrayList.add(newPoint);
+                distance_val.setText(round(distance,2) + " KM");
+                j = 0;
+                polyline.setPoints(arrayList);
+                polyline.setTag("A");
+                stylePolyline(polyline);
+            }
+        }
 
+    }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 
     @Override
@@ -277,6 +357,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void stylePolyline(Polyline polyline) {
         String type = "";
+
         // Get the data object stored with the polyline.
         if (polyline.getTag() != null) {
             type = polyline.getTag().toString();
@@ -285,7 +366,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
             // If no type is given, allow the API to use the default.
             case "A":
                 // Use a custom bitmap as the cap at the start of the line.
-                polyline.setStartCap(
+//                polyline.setStartCap(new RoundCap());
+                polyline.setEndCap(
                         new CustomCap(
                                 BitmapDescriptorFactory.fromResource(R.drawable.ic_arrow), 10));
                 break;
@@ -295,30 +377,39 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 break;
         }
 
-        polyline.setEndCap(new RoundCap());
+//        polyline.setStartCap(new CustomCap(
+//                BitmapDescriptorFactory.fromResource(R.drawable.square), 15));
         polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
-        polyline.setColor(COLOR_BLACK_ARGB);
+        polyline.setColor(COLOR_PURPLE_ARGB);
         polyline.setJointType(JointType.ROUND);
+    }
+
+    public Double harversineDistance(LatLng pointA, LatLng pointB){
+        // Radious of the earth
+        final int R = 6371;
+        Double lat1 = pointA.latitude;
+        Double lon1 = pointA.longitude;
+        Double lat2 = pointB.latitude;
+        Double lon2 = pointB.longitude;
+        Double latDistance = toRad(lat2-lat1);
+        Double lonDistance = toRad(lon2-lon1);
+        Double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                        Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        Double distance = R * c;
+        return distance;
+    }
+
+    public Double toRad(Double value) {
+        return value * Math.PI / 180;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
-        Polyline polyline1 = googleMap.addPolyline(new PolylineOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(-35.016, 143.321),
-                        new LatLng(-34.747, 145.592),
-                        new LatLng(-34.364, 147.891),
-                        new LatLng(-33.501, 150.217),
-                        new LatLng(-32.306, 149.248),
-                        new LatLng(-32.491, 147.309)));
-
-        polyline1.setTag("A");
-        stylePolyline(polyline1);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-35.684, 143.903), 5));
-
-        // Set listeners for click events.
+        this.googleMap = googleMap;
+        polyline = googleMap.addPolyline(new PolylineOptions().clickable(true));
         googleMap.setOnPolylineClickListener(this);
     }
+
 }
