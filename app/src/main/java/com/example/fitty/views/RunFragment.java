@@ -164,7 +164,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 //                        time_val.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
 //                            @Override
 //                            public void onChronometerTick(Chronometer chronometer) {
-//                                //
+//                                //Logic
 //                            }
 //                        });
                     }
