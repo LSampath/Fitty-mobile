@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.views.RunFragment">
+    tools:context=".views.RunFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -125,7 +125,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/fragment_run_tv_2" />
 
-            <TextView
+            <Chronometer
                 android:id="@+id/fragment_run_tv_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

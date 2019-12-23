@@ -12,14 +12,18 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fitty.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -36,7 +40,7 @@ import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
-import com.google.android.gms.maps.model.SquareCap;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +62,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private Button startBtn;
     private Button stopBtn;
     private Button pauseBtn;
-    private TextView distance_val, time_val, speed_val;
+    private TextView distance_val, speed_val;
+    private Chronometer time_val;
 
     private ConstraintLayout startLayout;
     private ConstraintLayout runLayout;
@@ -77,6 +82,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final PatternItem DOT = new Dot();
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
+    private static final int ACCURACY_LEVEL = 10;
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -89,11 +95,15 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private ArrayList<LatLng> arrayList;
     private ArrayList<LatLng> temp;
     private LatLng initialPosition;
-    private boolean initialPositionChecked = false;
+    private boolean initialPositionCheckedThroughLastLocation;
 
-    private int i;
     private int j;
-    private double distance = 0;
+    private boolean timeRunning;
+    private double distance;
+    private long pauseOffset;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private boolean initialPositionChecked;
 
     public RunFragment() {
         this.runActive = false;
@@ -106,8 +116,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -134,6 +144,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         distance_val = view.findViewById(R.id.fragment_run_tv_distance);
         time_val = view.findViewById(R.id.fragment_run_tv_time);
         speed_val = view.findViewById(R.id.fragment_run_tv_speed);
+        timeRunning = false;
 
         startLayout = view.findViewById(R.id.fragment_run_con_start);
         runLayout = view.findViewById(R.id.fragment_run_con_run);
@@ -146,13 +157,34 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     startLayout.setVisibility(View.INVISIBLE);
                     runLayout.setVisibility(View.VISIBLE);
                     resetText();
+                    if(!timeRunning){
+                        time_val.setBase(SystemClock.elapsedRealtime());
+                        time_val.start();
+                        timeRunning = true;
+//                        time_val.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+//                            @Override
+//                            public void onChronometerTick(Chronometer chronometer) {
+//                                //
+//                            }
+//                        });
+                    }
                 }
             }
         });
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //
+                    if (timeRunning){
+                        time_val.stop();
+                        pauseOffset = SystemClock.elapsedRealtime() - time_val.getBase();
+                        timeRunning = false;
+                        pauseBtn.setText("Start");
+                    } else {
+                        time_val.setBase(SystemClock.elapsedRealtime() - pauseOffset);
+                        time_val.start();
+                        timeRunning = true;
+                        pauseBtn.setText("Pause");
+                    }
             }
         });
         stopBtn.setOnClickListener(new View.OnClickListener() {
@@ -162,17 +194,32 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     RunFragment.this.runActive = false;
                     startLayout.setVisibility(View.VISIBLE);
                     runLayout.setVisibility(View.INVISIBLE);
+                    //TODO SaveToDatabase
                 }
             }
         });
 
         initGoogleMap(savedInstanceState);
 
-        i = 0;
+        initialPositionChecked = false;
+        initialPositionCheckedThroughLastLocation = false;
         j = 0;
+        distance = 0;
         temp = new ArrayList<>();
         arrayList = new ArrayList<>();
 
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            initialPosition = new LatLng(location.getLatitude(),location.getLongitude());
+                            initialPositionCheckedThroughLastLocation = true;
+                        }
+                    }
+                });
         return view;
     }
 
@@ -296,39 +343,49 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public synchronized void onLocationChanged(Location location) {
-        if (i>0 && !initialPositionChecked){
-            initialPosition = new LatLng(location.getLatitude(),location.getLongitude());
-            googleMap.addMarker(new MarkerOptions().position(new LatLng(initialPosition.latitude, initialPosition.longitude)).title("Starting Point"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(initialPosition.latitude, initialPosition.longitude), 15));
-            initialPositionChecked = true;
-            arrayList.add(initialPosition);
-        } else if(i<1){
-            i = i + 1;
-        } else {
-            double avg_lat = 0;
-            double avg_lon = 0;
-            j = j + 1;
-            temp.add(new LatLng(location.getLatitude(),location.getLongitude()));
-            speed_val.setText(Integer.toString(j));
-            if(j==10){
-                for (LatLng latLng: temp){
-                    avg_lat = avg_lat + latLng.latitude;
-                    avg_lon = avg_lon + latLng.longitude;
+        if(initialPositionChecked){
+            if(timeRunning){
+                double avg_lat = 0;
+                double avg_lon = 0;
+                j = j + 1;
+                temp.add(new LatLng(location.getLatitude(),location.getLongitude()));
+                if(j==ACCURACY_LEVEL){
+                    for (LatLng latLng: temp){
+                        avg_lat = avg_lat + latLng.latitude;
+                        avg_lon = avg_lon + latLng.longitude;
+                    }
+                    avg_lat = avg_lat/ACCURACY_LEVEL;
+                    avg_lon = avg_lon/ACCURACY_LEVEL;
+                    LatLng newPoint = new LatLng(avg_lat,avg_lon);
+                    temp.clear();
+                    distance = distance + round(harversineDistance(arrayList.get(arrayList.size()-1),newPoint),2);
+                    arrayList.add(newPoint);
+                    distance_val.setText(round(distance,2) + " KM");
+                    j = 0;
+                    polyline.setPoints(arrayList);
+                    polyline.setTag("A");
+                    stylePolyline(polyline);
+
+                    //speed
+                    Long currentTimeInSeconds = (SystemClock.elapsedRealtime() - time_val.getBase())/(1000);
+                    Double speed = (distance*3600)/currentTimeInSeconds;
+                    speed_val.setText(String.format("%.2f", speed) + " KMPH");
                 }
-                avg_lat = avg_lat/temp.size();
-                avg_lon = avg_lon/temp.size();
-                LatLng newPoint = new LatLng(avg_lat,avg_lon);
-                temp.clear();
-                distance = distance + round(harversineDistance(arrayList.get(arrayList.size()-1),newPoint),2);
-                arrayList.add(newPoint);
-                distance_val.setText(round(distance,2) + " KM");
-                j = 0;
-                polyline.setPoints(arrayList);
-                polyline.setTag("A");
-                stylePolyline(polyline);
+            }
+        } else{
+            if (!initialPositionCheckedThroughLastLocation){
+                initialPosition = new LatLng(location.getLatitude(),location.getLongitude());
+                googleMap.addMarker(new MarkerOptions().position(new LatLng(initialPosition.latitude, initialPosition.longitude)).title("Starting Point"));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(initialPosition.latitude, initialPosition.longitude), 15));
+                initialPositionChecked = true;
+                arrayList.add(initialPosition);
+            } else {
+                googleMap.addMarker(new MarkerOptions().position(new LatLng(initialPosition.latitude, initialPosition.longitude)).title("Starting Point"));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(initialPosition.latitude, initialPosition.longitude), 15));
+                arrayList.add(initialPosition);
+                initialPositionChecked = true;
             }
         }
-
     }
 
     public double round(double value, int places) {
