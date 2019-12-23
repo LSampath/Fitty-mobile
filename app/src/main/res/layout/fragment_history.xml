@@ -12,14 +12,23 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/fragment_history_tv_title"
+            android:id="@+id/text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This is my history"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="100dp"
+            android:text="disodjfsoij"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button"
+            tools:layout_editor_absoluteX="152dp"
+            tools:layout_editor_absoluteY="198dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

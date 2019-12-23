@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">Fitty</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_map">Map</string>
+    <string name="shared_preferences">ACCOUNT_PREFERENCES</string>
+    <string name="first_time">FIRST_COMER</string>
+    <string name="pref_name">NAME</string>
+    <string name="pref_age">AGE</string>
+    <string name="pref_gender">GENDER</string>
+    <string name="pref_height">HEIGHT</string>
+    <string name="pref_weight">WEIGHT</string>
+
 </resources>

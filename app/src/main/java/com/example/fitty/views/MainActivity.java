@@ -21,8 +21,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences preferences = this.getSharedPreferences("ACCOUNT_PREFERENCES", MODE_PRIVATE);
-        if (! preferences.getBoolean("FIRST_TIME", false)) {
+        SharedPreferences preferences = this.getSharedPreferences(getString(R.string.shared_preferences), MODE_PRIVATE);
+        if (preferences.getBoolean(getString(R.string.first_time), true)) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
