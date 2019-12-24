@@ -10,8 +10,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.example.fitty.Adapters.DatabaseHelper;
 import com.example.fitty.R;
+import com.example.fitty.controllers.RunController;
+import com.example.fitty.controllers.StepController;
+import com.example.fitty.models.RunningSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,12 +31,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
-        SharedPreferences preferences = this.getSharedPreferences("ACCOUNT_PREFERENCES", MODE_PRIVATE);
-//        if (! preferences.getBoolean("FIRST_TIME", false)) {
-//            Intent intent = new Intent(this, LoginActivity.class);
-//            startActivity(intent);
-//        }
-
 
         BottomNavigationView bottomNav = findViewById(R.id.navbar_bottom);
         bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -63,6 +62,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+//        remove this
+        DatabaseHelper db = new DatabaseHelper(this);
+//        long i = RunController.insertSession(db, new RunningSession(1577182315000L, 1577185915000L, 12.456));
+//        Toast.makeText(this,  i+"", Toast.LENGTH_LONG).show();
+//        RunController.insertSession(db, new RunningSession(1577159155000L, 1577166351234L, 10.46));
+//        RunController.insertSession(db, new RunningSession(1577166355000L, 1577184355000L, 12.45));
+//        RunController.insertSession(db, new RunningSession(1577179255000L, 1577180155000L, 2.4));
+
+
+
         setFragment(HomeFragment.newInstance());
     }
 
@@ -70,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.layout_container, object);
-//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
     }

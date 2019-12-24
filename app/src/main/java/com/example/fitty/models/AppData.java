@@ -12,7 +12,8 @@ public class AppData {
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
 
-    public static int[] CHART_VIEW_IDS = {
+    public static final int CHART_LIMIT = 30;
+    public static final int[] CHART_VIEW_IDS = {
             R.layout.view_step_chart,
             R.layout.view_run_chart
     };
