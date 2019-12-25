@@ -1,10 +1,8 @@
-package com.example.fitty.Adapters;
+package com.example.fitty.adapters;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import com.example.fitty.controllers.StepController;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 

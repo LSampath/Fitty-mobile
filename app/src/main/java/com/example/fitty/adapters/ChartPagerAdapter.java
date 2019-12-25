@@ -1,4 +1,4 @@
-package com.example.fitty.Adapters;
+package com.example.fitty.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -17,15 +17,12 @@ import com.example.fitty.models.AppData;
 import com.example.fitty.models.RunningSession;
 import com.example.fitty.models.StepCount;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class ChartPagerAdapter extends PagerAdapter {

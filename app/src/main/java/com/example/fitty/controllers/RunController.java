@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.example.fitty.Adapters.DatabaseHelper;
+import com.example.fitty.adapters.DatabaseHelper;
 import com.example.fitty.models.RunningSession;
 
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.fitty.Adapters.DatabaseHelper;
+import com.example.fitty.adapters.DatabaseHelper;
 import com.example.fitty.models.StepCount;
 
 import java.util.ArrayList;
