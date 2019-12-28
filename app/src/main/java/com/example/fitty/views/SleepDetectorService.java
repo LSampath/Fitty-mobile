@@ -45,6 +45,7 @@ public class SleepDetectorService extends Service {
     private long bestSleep;
     private Date sleepEnd;
     private float currentLight;
+    private SensorEventListener sensorEventListener;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -97,7 +98,7 @@ public class SleepDetectorService extends Service {
             ambLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         }
 
-        SensorEventListener sensorEventListener = new SensorEventListener() {
+        sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -286,7 +287,7 @@ public class SleepDetectorService extends Service {
 
     @Override
     public void onDestroy() {
-        System.out.println("Got Destroyed");
+        sensorManager.unregisterListener(sensorEventListener);
         super.onDestroy();
     }
 
