@@ -12,7 +12,12 @@ public class AppData {
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
 
-    public static int[] CHART_VIEW_IDS = {
+    public static final String RECEIVER_CODE = "code_de_receive";
+    public static final int COUNTER_START_RECEIVER = 34;
+    public static final int COUNTER_STOP_RECEIVER = 35;
+
+    public static final int CHART_LIMIT = 30;
+    public static final int[] CHART_VIEW_IDS = {
             R.layout.view_step_chart,
             R.layout.view_run_chart
     };
