@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.example.fitty.adapters.ChartPagerAdapter;
 import com.example.fitty.R;
+import com.example.fitty.models.StepCount;
 import com.example.fitty.services.StepCountService;
 
 
@@ -30,7 +31,10 @@ public class HomeFragment extends Fragment {
 
     private ViewPager pager;
     private TextView stepView;
+    private TextView calories;
     private BroadcastReceiver broadcastReceiver;
+    private StepCount stepCount;
+    private int todayCount = 0;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -56,6 +60,7 @@ public class HomeFragment extends Fragment {
         this.pager.setAdapter(new ChartPagerAdapter(HomeFragment.this.getContext()));
 
         stepView = (TextView) view.findViewById(R.id.fragment_home_tv_steps);
+        calories = (TextView) view.findViewById(R.id.fragment_home_tv_calory);
         startService(view);
         return view;
     }
@@ -77,7 +82,10 @@ public class HomeFragment extends Fragment {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                stepView.setText("" + intent.getExtras().get("step_value"));
+                todayCount = intent.getIntExtra("step_value",0);
+                getStepCount().setCount(todayCount);
+                stepView.setText("" + todayCount);
+                calories.setText("" + (float)getStepCount().getCalories(todayCount));
             }
         };
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("new_step_taken"));
@@ -93,4 +101,10 @@ public class HomeFragment extends Fragment {
         getActivity().stopService(serviceIntent);
     }
 
+    public StepCount getStepCount() {
+        if (this.stepCount == null){
+            this.stepCount = new StepCount((todayCount));
+        }
+        return stepCount;
+    }
 }
