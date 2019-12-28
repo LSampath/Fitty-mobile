@@ -8,11 +8,7 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-<!--    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>-->
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"></uses-permission>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:allowBackup="true"
@@ -50,12 +46,8 @@
             </intent-filter>
         </activity>
         <service android:name=".views.SleepDetectorService" />
-        <receiver
-            android:name=".views.SleepDetectorService"
-            android:enabled="true"
-            android:exported="false"
-            >
-        </receiver>
+        <service android:name=".views.RunTrackerService" />
+
     </application>
 
 </manifest>

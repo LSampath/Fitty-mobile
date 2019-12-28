@@ -47,7 +47,6 @@ public class SleepDetectorService extends Service {
     private float currentLight;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    @Nullable
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         initialize();
@@ -90,13 +89,13 @@ public class SleepDetectorService extends Service {
             }
         }
 
-        if(isSleeping != false){
-            isSleeping = false;
-        }
+        isSleeping = false;
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        ambLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        if(sensorManager!=null){
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            ambLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        }
 
         SensorEventListener sensorEventListener = new SensorEventListener() {
             @Override
@@ -291,6 +290,7 @@ public class SleepDetectorService extends Service {
         super.onDestroy();
     }
 
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
