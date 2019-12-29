@@ -1,6 +1,9 @@
 package com.example.fitty.views;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -9,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.fitty.R;
 
@@ -22,8 +26,11 @@ import com.example.fitty.R;
  */
 public class HeartRateFragment extends Fragment {
 
+    private BroadcastReceiver broadcastReceiver;
+
+    private TextView titleView;
+
     public HeartRateFragment() {
-        // Required empty public constructor
     }
 
     public static HeartRateFragment newInstance() {
@@ -39,19 +46,27 @@ public class HeartRateFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_heart_rate, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_heart_rate, container, false);
+
+        this.titleView = view.findViewById(R.id.fragment_heart_tv_title);
+
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                titleView.setText(intent.getExtras().get("value").toString());
+            }
+        };
+        getActivity().registerReceiver(broadcastReceiver, new IntentFilter("just_an_intent"));
+
+        return view;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+
     }
 
     @Override

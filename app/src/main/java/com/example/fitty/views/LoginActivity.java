@@ -12,6 +12,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.example.fitty.R;
+import com.example.fitty.models.AppData;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -48,14 +49,14 @@ public class LoginActivity extends AppCompatActivity {
                 float weight = Float.parseFloat(weightTxt.getText().toString());
                 String name = nameTxt.getText().toString();
 
-                SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.shared_preferences), MODE_PRIVATE).edit();
-                prefEditor.putString(getString(R.string.pref_name), name);
-                prefEditor.putString(getString(R.string.pref_gender), gender);
-                prefEditor.putInt(getString(R.string.pref_age), age);
-                prefEditor.putFloat(getString(R.string.pref_height), height);
-                prefEditor.putFloat(getString(R.string.pref_weight), weight);
+                SharedPreferences.Editor prefEditor = getSharedPreferences(AppData.SHARED_PREF, MODE_PRIVATE).edit();
+                prefEditor.putString(AppData.NAME, name);
+                prefEditor.putString(AppData.GENDER, gender);
+                prefEditor.putInt(AppData.AGE, age);
+                prefEditor.putFloat(AppData.HEIGHT, height);
+                prefEditor.putFloat(AppData.WEIGHT, weight);
 
-                prefEditor.putBoolean(getString(R.string.first_time), false);
+                prefEditor.putBoolean(AppData.FIRST_TIME, false);
                 prefEditor.commit();
 
                 LoginActivity.this.finish();

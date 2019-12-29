@@ -24,30 +24,39 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
+    AlarmManager alarmManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences preferences = this.getSharedPreferences(getString(R.string.shared_preferences), MODE_PRIVATE);
-        if (preferences.getBoolean(getString(R.string.first_time), true)) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-        }
+        SharedPreferences preferences = this.getSharedPreferences(AppData.SHARED_PREF, MODE_PRIVATE);
+//        if (preferences.getBoolean(AppData.FIRST_TIME, true)) {
+//            Intent intent = new Intent(this, LoginActivity.class);
+//            startActivity(intent);
+//        }
 
 
         // register broadcast receivers ////////////////////////////////////////////////////////////
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         Intent counterStartAlarm = new Intent(this, AlarmReceiver.class);
         counterStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_START_RECEIVER);
         PendingIntent startIntent = PendingIntent.getBroadcast(this, 0, counterStartAlarm, 0);
-        setRepeatingAlarm(startIntent, 23, 39, 15);
+        setRepeatingAlarm(startIntent, alarmManager, 23, 0, 2);
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(SystemClock.elapsedRealtime());
+//        alarmManager.setRepeating(
+//                AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(),
+//                AlarmManager.INTERVAL_FIFTEEN_MINUTES/15, startIntent
+//        );
+
 
         Intent counterStopAlarm = new Intent(this, AlarmReceiver.class);
         counterStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_STOP_RECEIVER);
         PendingIntent stopIntent = PendingIntent.getBroadcast(this, 1, counterStopAlarm, 0);
-        setRepeatingAlarm(stopIntent, 23, 39, 30);
+        setRepeatingAlarm(stopIntent, alarmManager, 23, 20, 0);
 
         // //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -102,14 +111,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setRepeatingAlarm(PendingIntent intent, int hour, int min, int sec) {
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
+    private void setRepeatingAlarm(PendingIntent intent, AlarmManager manager, int hour, int min, int sec) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(SystemClock.elapsedRealtime());
+
 //        calendar.set(Calendar.HOUR_OF_DAY, hour);
 //        calendar.set(Calendar.MINUTE, min);
 //        calendar.set(Calendar.SECOND, sec);
+        calendar.set(Calendar.MINUTE, min);
         calendar.add(Calendar.SECOND, sec);
 
         manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, intent);

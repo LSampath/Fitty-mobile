@@ -36,6 +36,7 @@
             android:name=".services.TestService"
             android:enabled="true"
             android:exported="true"
+            android:process=":TestServiceProcess"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver android:name=".adapters.AlarmReceiver" />

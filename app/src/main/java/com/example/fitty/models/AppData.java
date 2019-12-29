@@ -4,11 +4,13 @@ import com.example.fitty.R;
 
 public class AppData {
 
+    public static final String SHARED_PREF = "account_preferences";
+
     public static final String FIRST_TIME = "first_time_login";
 
     public static final String NAME = "name";
     public static final String AGE = "age";
-    public static final String GENGER = "gender";
+    public static final String GENDER = "gender";
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
 
@@ -21,9 +23,4 @@ public class AppData {
             R.layout.view_step_chart,
             R.layout.view_run_chart
     };
-
-
-//    remove this
-    public static double[] linechart_y = { 123, 3436, 2352, 2345, 2345, 6543, 3234, 1234, 3432, 1234, 2321};
-    public static int[] linechart_x = { 1, 2, 4, 5, 5, 2, 5, 2, 4, 6, 6};
 }
