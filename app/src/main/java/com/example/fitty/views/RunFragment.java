@@ -125,10 +125,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public void initialize(){
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         handler = new Handler();
         timerTask = new Timer();
@@ -141,6 +138,19 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         isNetworkEnabled = locationManager
                 .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
+        timeRunning = false;
+        getAlarmIntent = new Intent(getActivity(), RunTrackerService.class);
+
+        initialPositionChecked = false;
+        initialPositionCheckedThroughLastLocation = false;
+        distance = 0;
+        arrayList = new ArrayList<>();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_run, container, false);
 
         mapView = view.findViewById(R.id.fragment_run_map);
@@ -151,19 +161,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         distance_val = view.findViewById(R.id.fragment_run_tv_distance);
         time_val = view.findViewById(R.id.fragment_run_tv_time);
         speed_val = view.findViewById(R.id.fragment_run_tv_speed);
-        timeRunning = false;
 
         startLayout = view.findViewById(R.id.fragment_run_con_start);
         runLayout = view.findViewById(R.id.fragment_run_con_run);
 
-        getAlarmIntent = new Intent(getActivity(), RunTrackerService.class);
+        initialize();
 
         initGoogleMap(savedInstanceState);
-
-        initialPositionChecked = false;
-        initialPositionCheckedThroughLastLocation = false;
-        distance = 0;
-        arrayList = new ArrayList<>();
 
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
@@ -229,7 +233,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                     //stop run tracking service
                     getActivity().stopService(getAlarmIntent);
-
+                    initialize();
                     RunFragment.this.runActive = false;
                     startLayout.setVisibility(View.VISIBLE);
                     runLayout.setVisibility(View.INVISIBLE);
