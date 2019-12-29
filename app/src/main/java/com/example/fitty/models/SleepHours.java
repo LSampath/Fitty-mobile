@@ -1,20 +1,21 @@
 package com.example.fitty.models;
 
-import java.util.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
-public class StepCount {
+public class SleepHours {
+
 
     private Date date;
-    private int count;
+    private double hours;
 
-    public StepCount(String date, int count) {
+    public SleepHours(String date, double hours) {
         this.date = stringToDate(date);
-        this.count = count;
+        this.hours = hours;
     }
 
     public static Date stringToDate(String strDate) {
@@ -36,7 +37,7 @@ public class StepCount {
 
     public static String getToday() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
+//        calendar.add(Calendar.DATE, -1);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String date = dateFormat.format(calendar.getTime());
         return date;
@@ -50,7 +51,7 @@ public class StepCount {
         return dateToString(this.date, format);
     }
 
-    public int getCount() {
-        return count;
+    public double getHours() {
+        return hours;
     }
 }

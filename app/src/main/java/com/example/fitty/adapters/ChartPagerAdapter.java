@@ -12,9 +12,11 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import com.example.fitty.R;
 import com.example.fitty.controllers.RunController;
+import com.example.fitty.controllers.SleepController;
 import com.example.fitty.controllers.StepController;
 import com.example.fitty.models.AppData;
 import com.example.fitty.models.RunningSession;
+import com.example.fitty.models.SleepHours;
 import com.example.fitty.models.StepCount;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -62,7 +64,7 @@ public class ChartPagerAdapter extends PagerAdapter {
         if (AppData.CHART_VIEW_IDS[position] == R.layout.view_step_chart) {
             chart = view.findViewById(R.id.view_step_chart);
 
-            LineDataSet dataSet = new LineDataSet(getStepEntries(), "Steps");
+            LineDataSet dataSet = new LineDataSet(getStepEntries(), "Daily Steps");
             dataSet.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_1));
             dataSet.setDrawValues(false);
             dataSet.setDrawCircles(false);
@@ -86,6 +88,18 @@ public class ChartPagerAdapter extends PagerAdapter {
             speedDataset.setDrawCircles(false);
             speedDataset.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             multiple.add(speedDataset);
+
+        } else if (AppData.CHART_VIEW_IDS[position] == R.layout.view_sleep_chart) {
+            chart = view.findViewById(R.id.view_sleep_chart);
+
+            LineDataSet dataSet = new LineDataSet(getSleepEntries(), "Sleeping Hours");
+            dataSet.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_1));
+            dataSet.setDrawValues(false);
+            dataSet.setDrawCircles(false);
+            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+            multiple.add(dataSet);
+
         }
 
         LineData data = new LineData(multiple);
@@ -137,6 +151,17 @@ public class ChartPagerAdapter extends PagerAdapter {
         for (int i=0; i<n; i++) {
             entries.add(new Entry(i, (float) counts.get(i).getAvgSpeed()));
             Log.i("RUNNING", counts.get(i).getAvgSpeed()+"");
+        }
+        return entries;
+    }
+
+    private ArrayList getSleepEntries() {
+        ArrayList<Entry> entries = new ArrayList<>();
+        ArrayList<SleepHours> counts = SleepController.getHours(this.db);
+
+        int n = counts.size();
+        for (int i=0; i<n; i++) {
+            entries.add(new Entry(i, (float) counts.get(i).getHours()));
         }
         return entries;
     }

@@ -9,9 +9,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "fitty_db";
     public static final String STEP_TABLE = "step";
     public static final String RUN_TABLE = "run";
+    public static final String SLEEP_TABLE = "sleep";
 
     public DatabaseHelper(Context context) {
-        super(context, DB_NAME, null, 2);
+        super(context, DB_NAME, null, 3);
     }
 
     @Override
@@ -32,12 +33,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "distance DECIMAL(8,3) NOT NULL" +
                         ");"
         );
+
+        sqLiteDatabase.execSQL(
+                "CREATE TABLE " + SLEEP_TABLE + "(" +
+                        "sid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "sleep_date DATE NOT NULL, " +
+                        "hours DECIMAL(4,2) NOT NULL " +
+                        ");"
+        );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("drop table if exists " + STEP_TABLE);
         sqLiteDatabase.execSQL("drop table if exists " + RUN_TABLE);
+        sqLiteDatabase.execSQL("drop table if exists " + SLEEP_TABLE);
         onCreate(sqLiteDatabase);
     }
 

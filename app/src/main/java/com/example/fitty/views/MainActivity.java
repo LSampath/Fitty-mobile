@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import com.example.fitty.adapters.DatabaseHelper;
 import com.example.fitty.adapters.AlarmReceiver;
 import com.example.fitty.R;
+import com.example.fitty.controllers.SleepController;
+import com.example.fitty.controllers.StepController;
 import com.example.fitty.models.AppData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -39,24 +41,24 @@ public class MainActivity extends AppCompatActivity {
 
 
         // register broadcast receivers ////////////////////////////////////////////////////////////
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        Intent counterStartAlarm = new Intent(this, AlarmReceiver.class);
-        counterStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_START_RECEIVER);
-        PendingIntent startIntent = PendingIntent.getBroadcast(this, 0, counterStartAlarm, 0);
-        setRepeatingAlarm(startIntent, alarmManager, 23, 0, 2);
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(SystemClock.elapsedRealtime());
-//        alarmManager.setRepeating(
-//                AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(),
-//                AlarmManager.INTERVAL_FIFTEEN_MINUTES/15, startIntent
-//        );
-
-
-        Intent counterStopAlarm = new Intent(this, AlarmReceiver.class);
-        counterStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_STOP_RECEIVER);
-        PendingIntent stopIntent = PendingIntent.getBroadcast(this, 1, counterStopAlarm, 0);
-        setRepeatingAlarm(stopIntent, alarmManager, 23, 20, 0);
+//        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//
+//        Intent counterStartAlarm = new Intent(this, AlarmReceiver.class);
+//        counterStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_START_RECEIVER);
+//        PendingIntent startIntent = PendingIntent.getBroadcast(this, 0, counterStartAlarm, 0);
+//        setRepeatingAlarm(startIntent, alarmManager, 23, 0, 2);
+////        Calendar calendar = Calendar.getInstance();
+////        calendar.setTimeInMillis(SystemClock.elapsedRealtime());
+////        alarmManager.setRepeating(
+////                AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(),
+////                AlarmManager.INTERVAL_FIFTEEN_MINUTES/15, startIntent
+////        );
+//
+//
+//        Intent counterStopAlarm = new Intent(this, AlarmReceiver.class);
+//        counterStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_STOP_RECEIVER);
+//        PendingIntent stopIntent = PendingIntent.getBroadcast(this, 1, counterStopAlarm, 0);
+//        setRepeatingAlarm(stopIntent, alarmManager, 23, 20, 0);
 
         // //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,12 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
 //        remove this
         DatabaseHelper db = new DatabaseHelper(this);
-//        long i = RunController.insertSession(db, new RunningSession(1577182315000L, 1577185915000L, 12.456));
-//        Toast.makeText(this,  i+"", Toast.LENGTH_LONG).show();
-//        RunController.insertSession(db, new RunningSession(1577159155000L, 1577166351234L, 10.46));
-//        RunController.insertSession(db, new RunningSession(1577166355000L, 1577184355000L, 12.45));
-//        RunController.insertSession(db, new RunningSession(1577179255000L, 1577180155000L, 2.4));
-
+        SleepController.insertHours(db, 12.34);
+        SleepController.insertHours(db, 5.9);
+        SleepController.insertHours(db, 8.38);
 
 
         setFragment(HomeFragment.newInstance());
