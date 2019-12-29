@@ -123,13 +123,13 @@ public class RunTrackerService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        System.out.println("fuck");
         if(RunFragment.timeRunning){
             double avg_lat = 0;
             double avg_lon = 0;
             j = j + 1;
             temp.add(new LatLng(location.getLatitude(), location.getLongitude()));
             if (j == RunFragment.ACCURACY_LEVEL) {
+                j = 0;
                 for (LatLng latLng : temp) {
                     avg_lat = avg_lat + latLng.latitude;
                     avg_lon = avg_lon + latLng.longitude;

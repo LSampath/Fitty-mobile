@@ -86,7 +86,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final PatternItem DOT = new Dot();
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
-    protected static final int ACCURACY_LEVEL = 10;
+    protected static final int ACCURACY_LEVEL = 5;
     private static final int RESPONSIVENESS = 5000;
     private Timer timerTask;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -242,6 +242,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void startTracking() {
+        getActivity().startService(getAlarmIntent);
+
         timerTask.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -254,7 +256,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         }, 0, RESPONSIVENESS);
 
-        getActivity().startService(getAlarmIntent);
     }
 
     public void updateMap(){
