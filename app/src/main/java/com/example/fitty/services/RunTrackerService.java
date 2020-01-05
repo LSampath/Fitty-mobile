@@ -1,4 +1,4 @@
-package com.example.fitty.views;
+package com.example.fitty.services;
 
 import android.Manifest;
 import android.app.Notification;
@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 import com.example.fitty.R;
+import com.example.fitty.views.RunFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;

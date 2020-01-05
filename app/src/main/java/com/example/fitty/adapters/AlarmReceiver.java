@@ -17,11 +17,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         int receiver_code = intent.getExtras().getInt(AppData.RECEIVER_CODE);
 
         if (receiver_code == AppData.COUNTER_START_RECEIVER) {
+            Log.i("SERVICE", "............................................................START SERVICE");
 
             Intent i = new Intent(context, TestService.class);
             context.startService(i);
 
         } else if (receiver_code == AppData.COUNTER_STOP_RECEIVER) {
+            Log.i("SERVICE", "............................................................STOP SERVICE");
 
             Intent i = new Intent(context, TestService.class);
             context.stopService(i);

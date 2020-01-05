@@ -3,11 +3,8 @@ package com.example.fitty.views;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -22,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.fitty.R;
+import com.example.fitty.adapters.ImageProcessing;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -35,11 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class HeartRateFragment extends Fragment {
 
-    private BroadcastReceiver broadcastReceiver;
-
-    private TextView titleView;
-
-    //////////////////////////////////////////////
     private static final String TAG = "HeartRateMonitor";
     private static final AtomicBoolean processing = new AtomicBoolean(false);
 

@@ -14,6 +14,10 @@ public class AppData {
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
 
+    public static final int RUN_INIT_STATE = 1;
+    public static final int RUN_ACTIVE_STATE = 2;
+    public static final int RUN_FINAL_STATE = 3;
+
     public static final String RECEIVER_CODE = "code_de_receive";
     public static final int COUNTER_START_RECEIVER = 34;
     public static final int COUNTER_STOP_RECEIVER = 35;

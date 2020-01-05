@@ -7,9 +7,9 @@
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality.
     -->
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.flash" />
-    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -60,8 +60,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".views.SleepDetectorService" />
-        <service android:name=".views.RunTrackerService" />
+        <service android:name=".services.SleepDetectorService" />
+        <service android:name=".services.RunTrackerService" />
 
     </application>
 

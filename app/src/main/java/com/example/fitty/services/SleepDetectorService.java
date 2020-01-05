@@ -1,4 +1,4 @@
-package com.example.fitty.views;
+package com.example.fitty.services;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

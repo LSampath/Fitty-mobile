@@ -13,75 +13,79 @@
 
         <SurfaceView
             android:id="@+id/preview"
-            android:layout_width="201dp"
-            android:layout_height="100dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/img_avg_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.457"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/img_avg_text"
-            app:layout_constraintVertical_bias="0.757"></SurfaceView>
+            app:layout_constraintTop_toBottomOf="@+id/text"></SurfaceView>
 
         <TextView
             android:id="@+id/text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:text="Heart Rate Monitoring"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.005"
-            tools:layout_editor_absoluteX="16dp"></TextView>
+            android:layout_marginTop="20dp"
+            android:text="0 RPM"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/image"></TextView>
 
-        <com.example.fitty.views.HeartbeatPic
+        <com.example.fitty.adapters.HeartbeatPic
             android:id="@+id/image"
-            android:layout_width="50dp"
-            android:layout_height="27dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
             android:layout_weight="1"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.366"></com.example.fitty.views.HeartbeatPic>
+            app:layout_constraintTop_toBottomOf="@+id/fragment_heart_tv_1"></com.example.fitty.adapters.HeartbeatPic>
 
         <TextView
             android:id="@+id/rollavg_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/text"
             android:layout_alignParentStart="true"
-            android:text="TextView"
+            android:layout_marginStart="30dp"
+            android:layout_marginBottom="5dp"
+            android:text="Rolling Average"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.078"
-            tools:layout_editor_absoluteX="16dp" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/img_avg_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/rollavg_text"
             android:layout_alignParentStart="true"
-            android:text="TextView"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="5dp"
+            android:text="Image Average"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.182"
-            tools:layout_editor_absoluteX="0dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/fragment_heart_tv_title"
+            android:id="@+id/fragment_heart_tv_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This is the HEart rate page"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="30dp"
+            android:text="HEART RATE"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

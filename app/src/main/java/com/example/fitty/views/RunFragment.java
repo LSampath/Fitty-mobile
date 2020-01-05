@@ -10,11 +10,15 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +28,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fitty.R;
+import com.example.fitty.adapters.DatabaseHelper;
+import com.example.fitty.controllers.RunController;
+import com.example.fitty.models.AppData;
+import com.example.fitty.models.RunningSession;
+import com.example.fitty.services.RunTrackerService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -69,8 +78,15 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private TextView distance_val, speed_val;
     private Chronometer time_val;
 
-    private ConstraintLayout startLayout;
-    private ConstraintLayout runLayout;
+    private ConstraintLayout initLayout;
+    private ConstraintLayout activeLayout;
+    private ConstraintLayout finalLayout;
+
+    private Button saveBtn;
+    private Button discardBtn;
+    private TextView speedView;
+    private TextView durationView;
+    private TextView distanceView;
 
     // Polyline Styling
     private static final int COLOR_BLACK_ARGB = 0xff000000;
@@ -86,23 +102,23 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final PatternItem DOT = new Dot();
     private static final PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
     private static final List<PatternItem> PATTERN_POLYLINE_DOTTED = Arrays.asList(GAP, DOT);
-    protected static final int ACCURACY_LEVEL = 5;
+    public static final int ACCURACY_LEVEL = 5;
     private static final int RESPONSIVENESS = 5000;
     private Timer timerTask;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
-    private boolean runActive;
+    private int fragment_state;
     private Polyline polyline;
 
-    protected static boolean isGPSEnabled;
-    protected static boolean isNetworkEnabled;
+    public static boolean isGPSEnabled;
+    public static boolean isNetworkEnabled;
 
-    protected static ArrayList<LatLng> arrayList;
+    public static ArrayList<LatLng> arrayList;
     private LatLng initialPosition;
     private boolean initialPositionCheckedThroughLastLocation;
 
-    protected static boolean timeRunning;
-    protected static double distance;
+    public static boolean timeRunning;
+    public static double distance;
     private long pauseOffset;
 
     private FusedLocationProviderClient fusedLocationClient;
@@ -110,8 +126,10 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private Intent getAlarmIntent;
     private Handler handler;
 
+    private View mapContainer;
+
     public RunFragment() {
-        this.runActive = false;
+        this.fragment_state = AppData.RUN_INIT_STATE;
     }
 
     public static RunFragment newInstance() {
@@ -153,8 +171,21 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         speed_val = view.findViewById(R.id.fragment_run_tv_speed);
         timeRunning = false;
 
-        startLayout = view.findViewById(R.id.fragment_run_con_start);
-        runLayout = view.findViewById(R.id.fragment_run_con_run);
+        // final layout view initialization
+        saveBtn = view.findViewById(R.id.fragment_run_btn_save);
+        discardBtn = view.findViewById(R.id.fragment_run_btn_discard);
+        speedView = view.findViewById(R.id.fragment_run_tv_speed_2);
+        durationView = view.findViewById(R.id.fragment_run_tv_duration_2);
+        distanceView = view.findViewById(R.id.fragment_run_tv_distance_2);
+
+        mapContainer = view.findViewById(R.id.fragment_run_container);
+        initLayout = view.findViewById(R.id.fragment_run_con_init);
+        activeLayout = view.findViewById(R.id.fragment_run_con_active);
+        finalLayout = view.findViewById(R.id.fragment_run_con_final);
+
+        // only init layout is visible
+        fragment_state = AppData.RUN_INIT_STATE;
+//        updateLayout();
 
         getAlarmIntent = new Intent(getActivity(), RunTrackerService.class);
 
@@ -182,10 +213,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!RunFragment.this.runActive) {
-                    RunFragment.this.runActive = true;
-                    startLayout.setVisibility(View.INVISIBLE);
-                    runLayout.setVisibility(View.VISIBLE);
+                if (fragment_state == AppData.RUN_INIT_STATE) {
+
+                    // visible active layout
+                    fragment_state = AppData.RUN_ACTIVE_STATE;
+                    updateLayout();
+//                    setMargins(mapContainer, 0, 0, 0, 550);
+
                     resetText();
                     if(!timeRunning){
                         time_val.setBase(SystemClock.elapsedRealtime());
@@ -202,7 +236,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 }
             }
         });
-
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -222,7 +255,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (RunFragment.this.runActive) {
+                if (fragment_state == AppData.RUN_ACTIVE_STATE) {
 
                     //stop timer to update map
                     timerTask.cancel();
@@ -230,11 +263,40 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     //stop run tracking service
                     getActivity().stopService(getAlarmIntent);
 
-                    RunFragment.this.runActive = false;
-                    startLayout.setVisibility(View.VISIBLE);
-                    runLayout.setVisibility(View.INVISIBLE);
-                    //TODO SaveToDatabase
+
+                    fragment_state = AppData.RUN_FINAL_STATE;
+                    updateLayout();
+
+                    speedView.setText(speed_val.getText().toString());
+                    durationView.setText((SystemClock.elapsedRealtime() - time_val.getBase())/(1000) + " SEC");
+                    distanceView.setText(distance_val.getText().toString());
                 }
+            }
+        });
+
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String distanceStr = distanceView.getText().toString();
+                float distance = Float.parseFloat(distanceStr.substring(0, distanceStr.length()-3));
+
+                String durationStr = durationView.getText().toString();
+                long duration = Long.parseLong(durationStr.substring(0, durationStr.length()-4)) * 1000;
+
+                long startTime = time_val.getBase();
+                long endTime = time_val.getBase() + duration;
+
+                DatabaseHelper db = new DatabaseHelper(getContext());
+                RunController.insertSession(db, new RunningSession(startTime, endTime, distance));
+                Toast.makeText(getContext(), "Saved to database", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        discardBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragment_state = AppData.RUN_INIT_STATE;
+                updateLayout();
             }
         });
 
@@ -321,7 +383,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     public void resetText(){
         distance_val.setText("0 KM");
-        time_val.setText("0 Min 0 Sec");
+        time_val.setText("0 SEC");
         speed_val.setText("0 KMPH");
     }
 
@@ -333,6 +395,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onDetach() {
         super.onDetach();
+        getActivity().stopService(getAlarmIntent);
     }
 
     @Override
@@ -467,6 +530,34 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         this.googleMap = googleMap;
         polyline = googleMap.addPolyline(new PolylineOptions().clickable(true));
         googleMap.setOnPolylineClickListener(this);
+    }
+
+    private void updateLayout() {
+        initLayout.setVisibility(View.INVISIBLE);
+        activeLayout.setVisibility(View.INVISIBLE);
+        finalLayout.setVisibility(View.INVISIBLE);
+
+        int layout_id = 0;
+
+        if (this.fragment_state == AppData.RUN_INIT_STATE) {
+            initLayout.setVisibility(View.VISIBLE);
+            layout_id = R.id.fragment_run_con_init;
+        } else if (this.fragment_state == AppData.RUN_ACTIVE_STATE) {
+            activeLayout.setVisibility(View.VISIBLE);
+            layout_id = R.id.fragment_run_con_active;
+        } else if (this.fragment_state == AppData.RUN_FINAL_STATE) {
+            finalLayout.setVisibility(View.VISIBLE);
+            layout_id = R.id.fragment_run_con_final;
+        }
+
+        ConstraintSet set = new ConstraintSet();
+        ConstraintLayout layout;
+
+        layout = getActivity().findViewById(R.id.fragment_run_container_main);
+        set.clone(layout);
+        set.clear(R.id.fragment_run_container, ConstraintSet.BOTTOM);
+        set.connect(R.id.fragment_run_container, ConstraintSet.BOTTOM, layout_id, ConstraintSet.TOP,0);
+        set.applyTo(layout);
     }
 
 }

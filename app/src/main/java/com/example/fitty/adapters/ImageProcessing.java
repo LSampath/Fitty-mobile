@@ -1,4 +1,4 @@
-package com.example.fitty.views;
+package com.example.fitty.adapters;
 
 /**
  * This abstract class is used to process images.

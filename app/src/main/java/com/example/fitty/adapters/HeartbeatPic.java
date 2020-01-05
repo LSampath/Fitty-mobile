@@ -1,4 +1,4 @@
-package com.example.fitty.views;
+package com.example.fitty.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.example.fitty.R;
+import com.example.fitty.views.HeartRateFragment;
 
 
 /**
@@ -31,15 +32,15 @@ public class HeartbeatPic extends View {
     public HeartbeatPic(Context context, AttributeSet attr) {
         super(context, attr);
 
-        greenBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.green_icon);
-        redBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.red_icon);
+        greenBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.hand_green);
+        redBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.hand_red);
     }
 
     public HeartbeatPic(Context context) {
         super(context);
 
-        greenBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.green_icon);
-        redBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.red_icon);
+        greenBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.hand_green);
+        redBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.hand_red);
     }
 
     /**
@@ -62,7 +63,7 @@ public class HeartbeatPic extends View {
         if (canvas == null) throw new NullPointerException();
 
         Bitmap bitmap = null;
-        if (HeartRateFragment.getCurrent() == HeartRateFragment .TYPE.GREEN) bitmap = greenBitmap;
+        if (HeartRateFragment.getCurrent() == HeartRateFragment.TYPE.GREEN) bitmap = greenBitmap;
         else bitmap = redBitmap;
 
         int bitmapX = bitmap.getWidth() / 2;
