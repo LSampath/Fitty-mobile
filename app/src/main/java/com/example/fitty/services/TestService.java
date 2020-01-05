@@ -3,18 +3,11 @@ package com.example.fitty.services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.fitty.adapters.DatabaseHelper;
-import com.example.fitty.controllers.StepController;
-import com.example.fitty.models.Accelerometer;
 
 import java.util.Calendar;
 
