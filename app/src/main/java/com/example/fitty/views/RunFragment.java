@@ -194,6 +194,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     if(!timeRunning){
                         time_val.setBase(SystemClock.elapsedRealtime());
                         time_val.start();
+
                         timeRunning = true;
                         startTracking();
 //                        time_val.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -379,6 +380,9 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onDestroy() {
         mapView.onDestroy();
+        getActivity().stopService(getAlarmIntent);
+        initialize();
+        RunFragment.this.runActive = false;
         super.onDestroy();
     }
 

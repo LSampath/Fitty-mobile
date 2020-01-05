@@ -165,10 +165,10 @@ public class SleepDetectorService extends Service {
                 if (current.compareTo(justBefore12)>=0 && at12.compareTo(current) >= 0) {
                     // It's between 11.59am and 12 noon
                     dateSet = false;
-
                     // TODO
                     // Send Data to database
                     // reset variables
+                    initialize();
                 }
             } catch (ParseException e) {
                 // Exception
@@ -187,7 +187,6 @@ public class SleepDetectorService extends Service {
                         if ((current.getTime() - lastIdle.getTime()) / 1000 >= MIN_SLEEPING_HOURS * 3600) {
                             if((current.getTime() - lastIdle.getTime()) / 1000 <= MAX_SLEEPING_HOURS * 3600){
                                 isSleeping = true;
-                                // TODO
                                 // compare with last sleeping values and update sleepStart
                                 if(((current.getTime() - lastIdle.getTime()) / 1000) > bestSleep){
                                     sleepStart = lastIdle;
@@ -288,6 +287,7 @@ public class SleepDetectorService extends Service {
     @Override
     public void onDestroy() {
         sensorManager.unregisterListener(sensorEventListener);
+        stopForeground(true);
         super.onDestroy();
     }
 
