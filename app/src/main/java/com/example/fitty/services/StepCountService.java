@@ -37,6 +37,7 @@ public class StepCountService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("SERVICE", "................................................................Step counter started");
         this.sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -56,12 +57,14 @@ public class StepCountService extends Service {
         sensorManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accerlometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(sensorEventListener, accerlometer, SensorManager.SENSOR_DELAY_NORMAL);
-        return START_NOT_STICKY;
+
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.i("SERVICE", "................................................................Step counter stopped");
     }
 
     @Nullable

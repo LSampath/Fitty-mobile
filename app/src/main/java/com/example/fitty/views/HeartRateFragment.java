@@ -1,12 +1,15 @@
 package com.example.fitty.views;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Bundle;
 
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.PowerManager;
@@ -88,8 +91,17 @@ public class HeartRateFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_heart_rate, container, false);
 
-//        this.titleView = view.findViewById(R.id.fragment_heart_tv_title);
-    ///////////////////////////////////////////////
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Request Permission
+            requestPermissions(
+                    new String[]{Manifest.permission.CAMERA},
+                    0);
+        }
+
         SurfaceView preview = (SurfaceView) view.findViewById(R.id.preview);
         previewHolder = preview.getHolder();
         previewHolder.addCallback(surfaceCallback);

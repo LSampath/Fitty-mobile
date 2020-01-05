@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.fitty.adapters.ChartPagerAdapter;
 import com.example.fitty.R;
+import com.example.fitty.models.AppData;
 import com.example.fitty.models.StepCount;
 import com.example.fitty.services.StepCountService;
 
@@ -60,9 +61,9 @@ public class HomeFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        SharedPreferences preferences = getActivity().getSharedPreferences(getString(R.string.shared_preferences), 0);
-        this.weight = preferences.getFloat(getString(R.string.pref_weight), 0);
-        this.height = preferences.getFloat(getString(R.string.pref_height), 0);
+        SharedPreferences preferences = getActivity().getSharedPreferences(AppData.SHARED_PREF, 0);
+        this.weight = preferences.getFloat(AppData.WEIGHT, 0);
+        this.height = preferences.getFloat(AppData.HEIGHT, 0);
 
         this.pager = view.findViewById(R.id.fragment_home_pager);
         this.pager.setAdapter(new ChartPagerAdapter(HomeFragment.this.getContext()));

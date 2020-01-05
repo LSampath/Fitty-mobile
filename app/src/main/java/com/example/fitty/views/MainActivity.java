@@ -18,7 +18,15 @@ import android.view.MenuItem;
 
 import com.example.fitty.adapters.AlarmReceiver;
 import com.example.fitty.R;
+import com.example.fitty.adapters.DatabaseHelper;
+import com.example.fitty.controllers.RunController;
+import com.example.fitty.controllers.SleepController;
+import com.example.fitty.controllers.StepController;
 import com.example.fitty.models.AppData;
+import com.example.fitty.models.RunningSession;
+import com.example.fitty.services.SleepDetectorService;
+import com.example.fitty.services.StepCountService;
+import com.example.fitty.services.TestService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Calendar;
@@ -32,10 +40,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences preferences = this.getSharedPreferences(AppData.SHARED_PREF, MODE_PRIVATE);
-//        if (preferences.getBoolean(AppData.FIRST_TIME, true)) {
+        if (preferences.getBoolean(AppData.FIRST_TIME, true)) {
 //            Intent intent = new Intent(this, LoginActivity.class);
 //            startActivity(intent);
-//        }
+//
+//            DatabaseHelper db = new DatabaseHelper(this);
+//            SleepController.insertHours(db, 12.34);
+//            SleepController.insertHours(db, 5.9);
+//            SleepController.insertHours(db, 8.38);
+//
+//            StepController.insertCount(db, 8200);
+//            StepController.insertCount(db, 12300);
+//            StepController.insertCount(db, 6400);
+//
+//            RunController.insertSession(db, new RunningSession(1578242925884L, 1578253725884L, 12.34));
+//            RunController.insertSession(db, new RunningSession(1578242925884L, 1578248325884L, 8.54));
+//            RunController.insertSession(db, new RunningSession(1578242925884L, 1578250125884L, 6.90));
+
+            Intent intentStep = new Intent(this, StepCountService.class);
+            this.startService(intentStep);
+
+            Intent intentSleep = new Intent(this, SleepDetectorService.class);
+            this.startService(intentSleep);
+
+//            Intent test = new Intent(this, TestService.class);
+//            this.startService(test);
+        }
 
 
          //register broadcast receivers ////////////////////////////////////////////////////////////
@@ -56,12 +86,12 @@ public class MainActivity extends AppCompatActivity {
         Intent sleepStartAlarm = new Intent(this, AlarmManager.class);
         sleepStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_START_RECEIVER);
         PendingIntent sleepStartIntent = PendingIntent.getBroadcast(this, 2, sleepStartAlarm, 0);
-        setRepeatingAlarm(sleepStartIntent, alarmManager, 23, 23, 23);
+        setRepeatingAlarm(sleepStartIntent, alarmManager, 18, 0, 0);
 
         Intent sleepStopAlarm = new Intent(this, AlarmManager.class);
         sleepStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_STOP_RECEIVER);
         PendingIntent sleepStopIntent = PendingIntent.getBroadcast(this, 3, sleepStopAlarm, 0);
-        setRepeatingAlarm(sleepStopIntent, alarmManager, 23, 23, 23);
+        setRepeatingAlarm(sleepStopIntent, alarmManager, 17, 55, 0);
 
         // //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -91,13 +121,6 @@ public class MainActivity extends AppCompatActivity {
                 //
             }
         });
-
-//        remove this
-//        DatabaseHelper db = new DatabaseHelper(this);
-//        SleepController.insertHours(db, 12.34);
-//        SleepController.insertHours(db, 5.9);
-//        SleepController.insertHours(db, 8.38);
-
 
         setFragment(HomeFragment.newInstance());
     }

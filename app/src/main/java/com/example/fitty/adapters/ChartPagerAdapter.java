@@ -150,7 +150,7 @@ public class ChartPagerAdapter extends PagerAdapter {
         int n = counts.size();
         for (int i=0; i<n; i++) {
             entries.add(new Entry(i, (float) counts.get(i).getAvgSpeed()));
-            Log.i("RUNNING", counts.get(i).getAvgSpeed()+"");
+//            Log.i("RUNNING", counts.get(i).getAvgSpeed()+"");
         }
         return entries;
     }
