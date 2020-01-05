@@ -79,14 +79,14 @@ public class ChartPagerAdapter extends PagerAdapter {
             distanceDataset.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_1));
             distanceDataset.setDrawValues(false);
             distanceDataset.setDrawCircles(false);
-            distanceDataset.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+//            distanceDataset.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             multiple.add(distanceDataset);
 
             LineDataSet speedDataset = new LineDataSet(getSpeedEntries(), "Avg Speed");
             speedDataset.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_2));
             speedDataset.setDrawValues(false);
             speedDataset.setDrawCircles(false);
-            speedDataset.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+//            speedDataset.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             multiple.add(speedDataset);
 
         } else if (AppData.CHART_VIEW_IDS[position] == R.layout.view_sleep_chart) {
@@ -96,7 +96,7 @@ public class ChartPagerAdapter extends PagerAdapter {
             dataSet.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_1));
             dataSet.setDrawValues(false);
             dataSet.setDrawCircles(false);
-            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+//            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
             multiple.add(dataSet);
 
