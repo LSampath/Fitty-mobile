@@ -13,7 +13,7 @@ public class StepCount {
     private int count;
 
     public StepCount(String date, int count) {
-        this.date = stringToDate(date);
+        this.date = stringToDate(date);;
         this.count = count;
     }
 
@@ -52,5 +52,35 @@ public class StepCount {
 
     public int getCount() {
         return count;
+    }
+
+    /**
+     *
+     * @return caloriesperMile
+     */
+    public static double getCalories(int steps, float weight, float height) {
+        double caloriesperMile = 1.57 * weight;
+        double caloriesperStep = caloriesperMile / calStepsPerMile(height);
+        double totalCaloris = caloriesperStep * steps;
+        return totalCaloris;
+    }
+
+    /**
+     *
+     * @return stepsPerMile
+     */
+    public static double calStepsPerMile(float height) {
+        double heightInches = height * 0.393701;
+        double averageStrideLenght = 0.413 * heightInches / 12;
+        double stepsPerMile = 5280 / averageStrideLenght;
+        return stepsPerMile;
+    }
+
+    /**
+     *
+     * @param count
+     */
+    public void setCount(int count) {
+        this.count = count;
     }
 }

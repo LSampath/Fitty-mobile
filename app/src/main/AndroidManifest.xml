@@ -63,6 +63,7 @@
         <service android:name=".services.SleepDetectorService" />
         <service android:name=".services.RunTrackerService" />
 
+        <service android:name=".services.StepCountService" />
     </application>
 
 </manifest>
