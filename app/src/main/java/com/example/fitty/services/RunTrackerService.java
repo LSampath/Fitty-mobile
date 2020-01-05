@@ -36,6 +36,7 @@ public class RunTrackerService extends Service implements LocationListener {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         temp = new ArrayList<>();
         j = 0;
         locationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
@@ -118,7 +119,7 @@ public class RunTrackerService extends Service implements LocationListener {
     @Override
     public void onDestroy() {
         locationManager.removeUpdates(this);
-        locationManager = null;
+        stopForeground(true);
         super.onDestroy();
     }
 

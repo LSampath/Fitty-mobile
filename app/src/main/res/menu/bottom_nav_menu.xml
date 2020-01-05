@@ -20,14 +20,7 @@
         android:id="@+id/action_run"
         android:enabled="true"
         android:icon="@drawable/run"
-        android:title="Runing"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_history"
-        android:enabled="true"
-        android:icon="@drawable/history"
-        android:title="History"
+        android:title="Running"
         app:showAsAction="ifRoom" />
 
 </menu>

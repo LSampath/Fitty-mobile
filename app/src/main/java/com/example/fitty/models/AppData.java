@@ -19,8 +19,10 @@ public class AppData {
     public static final int RUN_FINAL_STATE = 3;
 
     public static final String RECEIVER_CODE = "code_de_receive";
-    public static final int COUNTER_START_RECEIVER = 34;
-    public static final int COUNTER_STOP_RECEIVER = 35;
+    public static final int COUNTER_START_RECEIVER = 134;
+    public static final int COUNTER_STOP_RECEIVER = 135;
+    public static final int SLEEP_START_RECEIVER = 136;
+    public static final int SLEEP_STOP_RECEIVER = 137;
 
     public static final int CHART_LIMIT = 30;
     public static final int[] CHART_VIEW_IDS = {

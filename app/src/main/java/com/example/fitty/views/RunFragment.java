@@ -126,7 +126,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private Intent getAlarmIntent;
     private Handler handler;
 
-    private View mapContainer;
 
     public RunFragment() {
         this.fragment_state = AppData.RUN_INIT_STATE;
@@ -143,10 +142,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public void initialize(){
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         handler = new Handler();
         timerTask = new Timer();
@@ -158,6 +154,19 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         // getting network status
         isNetworkEnabled = locationManager
                 .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        timeRunning = false;
+        getAlarmIntent = new Intent(getActivity(), RunTrackerService.class);
+
+        initialPositionChecked = false;
+        initialPositionCheckedThroughLastLocation = false;
+        distance = 0;
+        arrayList = new ArrayList<>();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_run, container, false);
 
@@ -178,7 +187,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         durationView = view.findViewById(R.id.fragment_run_tv_duration_2);
         distanceView = view.findViewById(R.id.fragment_run_tv_distance_2);
 
-        mapContainer = view.findViewById(R.id.fragment_run_container);
         initLayout = view.findViewById(R.id.fragment_run_con_init);
         activeLayout = view.findViewById(R.id.fragment_run_con_active);
         finalLayout = view.findViewById(R.id.fragment_run_con_final);
@@ -187,14 +195,9 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
         fragment_state = AppData.RUN_INIT_STATE;
 //        updateLayout();
 
-        getAlarmIntent = new Intent(getActivity(), RunTrackerService.class);
+        initialize();
 
         initGoogleMap(savedInstanceState);
-
-        initialPositionChecked = false;
-        initialPositionCheckedThroughLastLocation = false;
-        distance = 0;
-        arrayList = new ArrayList<>();
 
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
@@ -218,12 +221,12 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     // visible active layout
                     fragment_state = AppData.RUN_ACTIVE_STATE;
                     updateLayout();
-//                    setMargins(mapContainer, 0, 0, 0, 550);
 
                     resetText();
                     if(!timeRunning){
                         time_val.setBase(SystemClock.elapsedRealtime());
                         time_val.start();
+
                         timeRunning = true;
                         startTracking();
 //                        time_val.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -262,7 +265,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                     //stop run tracking service
                     getActivity().stopService(getAlarmIntent);
-
+                    initialize();
 
                     fragment_state = AppData.RUN_FINAL_STATE;
                     updateLayout();
@@ -438,6 +441,9 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onDestroy() {
         mapView.onDestroy();
+        getActivity().stopService(getAlarmIntent);
+        initialize();
+//        RunFragment.this.runActive = false;
         super.onDestroy();
     }
 

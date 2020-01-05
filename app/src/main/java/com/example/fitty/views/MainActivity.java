@@ -40,16 +40,28 @@ public class MainActivity extends AppCompatActivity {
 
          //register broadcast receivers ////////////////////////////////////////////////////////////
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//
+
+        // Step counter service
         Intent counterStartAlarm = new Intent(this, AlarmReceiver.class);
         counterStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_START_RECEIVER);
-        PendingIntent startIntent = PendingIntent.getBroadcast(this, 0, counterStartAlarm, 0);
-        setRepeatingAlarm(startIntent, alarmManager, 23, 13, 0);
+        PendingIntent counterStartIntent = PendingIntent.getBroadcast(this, 0, counterStartAlarm, 0);
+        setRepeatingAlarm(counterStartIntent, alarmManager, 23, 55, 0);
 
         Intent counterStopAlarm = new Intent(this, AlarmReceiver.class);
         counterStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_STOP_RECEIVER);
-        PendingIntent stopIntent = PendingIntent.getBroadcast(this, 1, counterStopAlarm, 0);
-        setRepeatingAlarm(stopIntent, alarmManager, 23, 17, 30);
+        PendingIntent counterStopIntent = PendingIntent.getBroadcast(this, 1, counterStopAlarm, 0);
+        setRepeatingAlarm(counterStopIntent, alarmManager, 0, 05, 0);
+
+        // Sleep detector service
+        Intent sleepStartAlarm = new Intent(this, AlarmManager.class);
+        sleepStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_START_RECEIVER);
+        PendingIntent sleepStartIntent = PendingIntent.getBroadcast(this, 2, sleepStartAlarm, 0);
+        setRepeatingAlarm(sleepStartIntent, alarmManager, 23, 23, 23);
+
+        Intent sleepStopAlarm = new Intent(this, AlarmManager.class);
+        sleepStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_STOP_RECEIVER);
+        PendingIntent sleepStopIntent = PendingIntent.getBroadcast(this, 3, sleepStopAlarm, 0);
+        setRepeatingAlarm(sleepStopIntent, alarmManager, 23, 23, 23);
 
         // //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -67,9 +79,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.action_run:
                         setFragment(RunFragment.newInstance());
-                        break;
-                    case R.id.action_history:
-                        setFragment(HistoryFragment.newInstance());
                         break;
                 }
                 return true;
@@ -104,19 +113,9 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
-//        calendar.add(Calendar.DATE, 1);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, min);
         calendar.set(Calendar.SECOND, sec);
-
-        Log.i("TIME", "..............................................HOUR " + calendar.get(Calendar.HOUR_OF_DAY));
-        Log.i("TIME", "..............................................MINUTE " + calendar.get(Calendar.MINUTE));
-        Log.i("TIME", "..............................................SECOND " + calendar.get(Calendar.SECOND));
-
-        Log.i("TIME", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + calendar.getTimeInMillis());
-        Log.i("TIME", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + SystemClock.elapsedRealtime());
-
-//        calendar.add(Calendar.SECOND, sec);
 
         manager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, intent);
     }

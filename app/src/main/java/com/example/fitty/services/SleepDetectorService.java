@@ -19,6 +19,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.example.fitty.R;
+import com.example.fitty.adapters.DatabaseHelper;
+import com.example.fitty.controllers.SleepController;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,6 +45,7 @@ public class SleepDetectorService extends Service {
     private Date sleepStart;
     private long lastSleep;
     private long bestSleep;
+
     private Date sleepEnd;
     private float currentLight;
     private SensorEventListener sensorEventListener;
@@ -166,9 +169,12 @@ public class SleepDetectorService extends Service {
                     // It's between 11.59am and 12 noon
                     dateSet = false;
 
-                    // TODO
-                    // Send Data to database
+                    DatabaseHelper db = new DatabaseHelper(getBaseContext());
+                    double hours = bestSleep / 60*60;
+                    SleepController.insertHours(db, hours);
+
                     // reset variables
+                    initialize();
                 }
             } catch (ParseException e) {
                 // Exception
@@ -187,7 +193,6 @@ public class SleepDetectorService extends Service {
                         if ((current.getTime() - lastIdle.getTime()) / 1000 >= MIN_SLEEPING_HOURS * 3600) {
                             if((current.getTime() - lastIdle.getTime()) / 1000 <= MAX_SLEEPING_HOURS * 3600){
                                 isSleeping = true;
-                                // TODO
                                 // compare with last sleeping values and update sleepStart
                                 if(((current.getTime() - lastIdle.getTime()) / 1000) > bestSleep){
                                     sleepStart = lastIdle;
@@ -288,6 +293,7 @@ public class SleepDetectorService extends Service {
     @Override
     public void onDestroy() {
         sensorManager.unregisterListener(sensorEventListener);
+        stopForeground(true);
         super.onDestroy();
     }
 
