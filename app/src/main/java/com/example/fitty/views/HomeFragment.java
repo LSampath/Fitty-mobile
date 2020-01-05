@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -36,6 +37,9 @@ public class HomeFragment extends Fragment {
     private StepCount stepCount;
     private int todayCount = 0;
 
+    private float weight;
+    private float height;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -56,12 +60,16 @@ public class HomeFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        SharedPreferences preferences = getActivity().getSharedPreferences(getString(R.string.shared_preferences), 0);
+        this.weight = preferences.getFloat(getString(R.string.pref_weight), 0);
+        this.height = preferences.getFloat(getString(R.string.pref_height), 0);
+
         this.pager = view.findViewById(R.id.fragment_home_pager);
         this.pager.setAdapter(new ChartPagerAdapter(HomeFragment.this.getContext()));
 
         stepView = (TextView) view.findViewById(R.id.fragment_home_tv_steps);
         calories = (TextView) view.findViewById(R.id.fragment_home_tv_calory);
-        startService(view);
+//        startService(view);
         return view;
     }
 
@@ -83,9 +91,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 todayCount = intent.getIntExtra("step_value",0);
-                getStepCount().setCount(todayCount);
+//                getStepCount().setCount(todayCount);
                 stepView.setText("" + todayCount);
-                calories.setText("" + (float)getStepCount().getCalories(todayCount));
+                calories.setText("" + (float) StepCount.getCalories(todayCount, weight, height));
             }
         };
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("new_step_taken"));
@@ -101,10 +109,4 @@ public class HomeFragment extends Fragment {
         getActivity().stopService(serviceIntent);
     }
 
-    public StepCount getStepCount() {
-        if (this.stepCount == null){
-            this.stepCount = new StepCount((todayCount));
-        }
-        return stepCount;
-    }
 }
