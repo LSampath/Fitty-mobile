@@ -53,8 +53,8 @@ public class SleepDetectorService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        resetVariables();
         initialize();
-
         // Notification
         String NOTIFICATION_CHANNEL_ID = "com.example.FITTY";
         String channelName = "Sleep Detection Background Service";
@@ -77,13 +77,13 @@ public class SleepDetectorService extends Service {
         return START_STICKY;
     }
 
-    public void initialize() {
+    public void resetVariables(){
         currentLight = 0;
         lastSleep = 0L;
         bestSleep = 0L;
-        currentDay = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
         String currentTime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
         SimpleDateFormat defaultDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+
         if(lastIdle == null){
             try {
                 lastIdle = defaultDateFormat.parse(currentTime);
@@ -95,6 +95,11 @@ public class SleepDetectorService extends Service {
 
         isSleeping = false;
 
+    }
+
+    public void initialize() {
+        currentDay = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+        dateSet = true;
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if(sensorManager!=null){
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -130,6 +135,7 @@ public class SleepDetectorService extends Service {
 
     public boolean lightConditionsSuitable(){
         if(currentLight>MAX_LIGHT_SUITABLE){
+            System.out.println("Light is not suitable");
             return false;
         }
         return true;
@@ -140,8 +146,8 @@ public class SleepDetectorService extends Service {
         // Date setting
         if(!dateSet){
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-            String dayBegining =  new SimpleDateFormat("12:00:00", Locale.getDefault()).format(new Date());
-            String justAfterDayBegining =  new SimpleDateFormat("12:10:00", Locale.getDefault()).format(new Date());
+            String dayBegining =  new SimpleDateFormat("12:00:01", Locale.getDefault()).format(new Date());
+            String justAfterDayBegining =  new SimpleDateFormat("12:01:00", Locale.getDefault()).format(new Date());
             String currentTime = new SimpleDateFormat("H:mm:ss", Locale.getDefault()).format(new Date());
             try {
                 Date current = timeFormat.parse(currentTime);
@@ -149,16 +155,15 @@ public class SleepDetectorService extends Service {
                 Date bitAfter12 = timeFormat.parse(justAfterDayBegining);
                 if (current.compareTo(rightAt12)>=0 && bitAfter12.compareTo(current) >= 0) {
                     // It's between 12 noon and 12.10pm
-                    dateSet = true;
-
                     currentDay = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+                    dateSet = true;
                 }
             } catch (ParseException e) {
                 // Exception
             }
         } else {
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-            String justBeforeDayBegining =  new SimpleDateFormat("11:50:00", Locale.getDefault()).format(new Date());
+            String justBeforeDayBegining =  new SimpleDateFormat("11:59:00", Locale.getDefault()).format(new Date());
             String dayBegining =  new SimpleDateFormat("12:00:00", Locale.getDefault()).format(new Date());
             String currentTime = new SimpleDateFormat("H:mm:ss", Locale.getDefault()).format(new Date());
             try {
@@ -174,7 +179,7 @@ public class SleepDetectorService extends Service {
                     SleepController.insertHours(db, hours);
 
                     // reset variables
-                    initialize();
+                    resetVariables();
                 }
             } catch (ParseException e) {
                 // Exception
