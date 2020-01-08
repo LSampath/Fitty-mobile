@@ -19,22 +19,33 @@ import com.example.fitty.models.RunningSession;
 import com.example.fitty.models.SleepHours;
 import com.example.fitty.models.StepCount;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ChartPagerAdapter extends PagerAdapter {
 
     private Context context;
     private DatabaseHelper db;
 
+    private ArrayList<String> dates;
+
     public ChartPagerAdapter(Context context) {
         this.context = context;
         this.db = new DatabaseHelper(context);
+
+        this.dates = new ArrayList<>();
     }
 
     @Override
@@ -60,46 +71,50 @@ public class ChartPagerAdapter extends PagerAdapter {
 
         LineChart chart = null;
         ArrayList<ILineDataSet> multiple = new ArrayList<>();
+        dates = null;
 
         if (AppData.CHART_VIEW_IDS[position] == R.layout.view_step_chart) {
             chart = view.findViewById(R.id.view_step_chart);
+
+            dates = getStepDates();
 
             LineDataSet dataSet = new LineDataSet(getStepEntries(), "Daily Steps");
             dataSet.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_1));
             dataSet.setDrawValues(false);
             dataSet.setDrawCircles(false);
-            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+            LimitLine line = new LimitLine(AppData.STEPS_LOWER_BOUND);
+            line.setLabel("Least Steps");
+            chart.getAxisLeft().addLimitLine(line);
 
             multiple.add(dataSet);
 
         } else if (AppData.CHART_VIEW_IDS[position] == R.layout.view_run_chart) {
             chart = view.findViewById(R.id.view_run_chart);
 
+            dates = getDistanceDates();
+
             LineDataSet distanceDataset = new LineDataSet(getDistanceEntries(), "Distance");
             distanceDataset.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_1));
             distanceDataset.setDrawValues(false);
             distanceDataset.setDrawCircles(false);
-//            distanceDataset.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             multiple.add(distanceDataset);
-
-            LineDataSet speedDataset = new LineDataSet(getSpeedEntries(), "Avg Speed");
-            speedDataset.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_2));
-            speedDataset.setDrawValues(false);
-            speedDataset.setDrawCircles(false);
-//            speedDataset.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-            multiple.add(speedDataset);
 
         } else if (AppData.CHART_VIEW_IDS[position] == R.layout.view_sleep_chart) {
             chart = view.findViewById(R.id.view_sleep_chart);
+
+            dates = getSleepDates();
 
             LineDataSet dataSet = new LineDataSet(getSleepEntries(), "Sleeping Hours");
             dataSet.setColor(ContextCompat.getColor(ChartPagerAdapter.this.context, R.color.chart_1));
             dataSet.setDrawValues(false);
             dataSet.setDrawCircles(false);
-//            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+            LimitLine line = new LimitLine((float) AppData.SLEEP_LOWER_BOUND);
+            line.setLabel("Least Hours");
+            chart.getAxisLeft().addLimitLine(line);
 
             multiple.add(dataSet);
-
         }
 
         LineData data = new LineData(multiple);
@@ -109,7 +124,19 @@ public class ChartPagerAdapter extends PagerAdapter {
         XAxis xAxis = chart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawLabels(false);
+        xAxis.setDrawLabels(true);
+
+//        xAxis.setValueFormatter(new ValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value) {
+//                try {
+//                    return dates.get((int) value);
+//                } catch (Exception e) {
+//                    return "";
+//                }
+//            }
+//        });
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(dates));
 
         chart.getDescription().setTextSize(12);
         chart.getDescription().setEnabled(false);
@@ -132,6 +159,18 @@ public class ChartPagerAdapter extends PagerAdapter {
         return entries;
     }
 
+    private ArrayList getStepDates() {
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<StepCount> counts = StepController.getCounts(this.db);
+
+        int n = counts.size();
+        for (int i=0; i<n; i++) {
+            String date = StepCount.dateToString(counts.get(i).getDate(), "MMM dd");
+            dates.add(date);
+        }
+        return dates;
+    }
+
     private ArrayList getDistanceEntries() {
         ArrayList<Entry> entries = new ArrayList<>();
         ArrayList<RunningSession> sessions = RunController.getSessions(this.db);
@@ -141,6 +180,18 @@ public class ChartPagerAdapter extends PagerAdapter {
             entries.add(new Entry(i, (float) sessions.get(i).getDistance()));
         }
         return entries;
+    }
+
+    private ArrayList getDistanceDates() {
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<RunningSession> counts = RunController.getSessions(this.db);
+
+        int n = counts.size();
+        for (int i=0; i<n; i++) {
+            String date = StepCount.dateToString(new Date(counts.get(i).getEndTime()), "MMM dd");
+            dates.add(date);
+        }
+        return dates;
     }
 
     private ArrayList getSpeedEntries() {
@@ -164,5 +215,16 @@ public class ChartPagerAdapter extends PagerAdapter {
             entries.add(new Entry(i, (float) counts.get(i).getHours()));
         }
         return entries;
+    }
+
+    private ArrayList getSleepDates() {
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<SleepHours> hours = SleepController.getHours(this.db);
+
+        int n = hours.size();
+        for (int i=0; i<n; i++) {
+            dates.add(hours.get(i).getDateString("MMM dd"));
+        }
+        return dates;
     }
 }

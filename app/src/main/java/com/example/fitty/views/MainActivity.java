@@ -2,15 +2,19 @@ package com.example.fitty.views;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -26,7 +30,6 @@ import com.example.fitty.models.AppData;
 import com.example.fitty.models.RunningSession;
 import com.example.fitty.services.SleepDetectorService;
 import com.example.fitty.services.StepCountService;
-import com.example.fitty.services.TestService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Calendar;
@@ -41,21 +44,54 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences preferences = this.getSharedPreferences(AppData.SHARED_PREF, MODE_PRIVATE);
         if (preferences.getBoolean(AppData.FIRST_TIME, true)) {
-//            Intent intent = new Intent(this, LoginActivity.class);
-//            startActivity(intent);
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+
+            // request permissions
+            if (!checkPermissions(this, AppData.PERMISSIONS)) {
+                ActivityCompat.requestPermissions(this, AppData.PERMISSIONS, 1);
+            }
+
+            DatabaseHelper db = new DatabaseHelper(this);
+            SleepController.insertHoursCustom(db, 10.5, -4);
+            SleepController.insertHoursCustom(db, 8, -3);
+            SleepController.insertHoursCustom(db, 7.36, -2);
+            SleepController.insertHoursCustom(db, 9.5, -1);
+
+            StepController.insertCountCustom(db, 13500, -5);
+            StepController.insertCountCustom(db, 8020, -4);
+            StepController.insertCountCustom(db, 12500, -3);
+            StepController.insertCountCustom(db, 9540, -2);
+            StepController.insertCountCustom(db, 1034, -1);
+
+            RunController.insertSessionCustom(db, 10.14, 90, -3);
+            RunController.insertSessionCustom(db, 13.14, 120, -2);
+            RunController.insertSessionCustom(db, 8.54, 75, -1);
+
+            //register broadcast receivers ////////////////////////////////////////////////////////////
+            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+            // Step counter service
+//            Intent counterStartAlarm = new Intent(this, AlarmReceiver.class);
+//            counterStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_START_RECEIVER);
+//            PendingIntent counterStartIntent = PendingIntent.getBroadcast(this, 243, counterStartAlarm, PendingIntent.FLAG_ONE_SHOT);
+//            setRepeatingAlarm(counterStartIntent, alarmManager, 23, 36, 0);
 //
-//            DatabaseHelper db = new DatabaseHelper(this);
-//            SleepController.insertHours(db, 12.34);
-//            SleepController.insertHours(db, 5.9);
-//            SleepController.insertHours(db, 8.38);
+//            Intent counterStopAlarm = new Intent(this, AlarmReceiver.class);
+//            counterStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_STOP_RECEIVER);
+//            PendingIntent counterStopIntent = PendingIntent.getBroadcast(this, 244, counterStopAlarm, PendingIntent.FLAG_ONE_SHOT);
+//            setRepeatingAlarm(counterStopIntent, alarmManager, 23, 39, 0);
 //
-//            StepController.insertCount(db, 8200);
-//            StepController.insertCount(db, 12300);
-//            StepController.insertCount(db, 6400);
+//            // Sleep detector service
+//            Intent sleepStartAlarm = new Intent(this, AlarmManager.class);
+//            sleepStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_START_RECEIVER);
+//            PendingIntent sleepStartIntent = PendingIntent.getBroadcast(this, 245, sleepStartAlarm, PendingIntent.FLAG_ONE_SHOT);
+//            setRepeatingAlarm(sleepStartIntent, alarmManager, 23, 40, 0);
 //
-//            RunController.insertSession(db, new RunningSession(1578242925884L, 1578253725884L, 12.34));
-//            RunController.insertSession(db, new RunningSession(1578242925884L, 1578248325884L, 8.54));
-//            RunController.insertSession(db, new RunningSession(1578242925884L, 1578250125884L, 6.90));
+//            Intent sleepStopAlarm = new Intent(this, AlarmManager.class);
+//            sleepStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_STOP_RECEIVER);
+//            PendingIntent sleepStopIntent = PendingIntent.getBroadcast(this, 246, sleepStopAlarm, PendingIntent.FLAG_ONE_SHOT);
+//            setRepeatingAlarm(sleepStopIntent, alarmManager, 23, 42, 0);
 
             Intent intentStep = new Intent(this, StepCountService.class);
             this.startService(intentStep);
@@ -63,37 +99,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intentSleep = new Intent(this, SleepDetectorService.class);
             this.startService(intentSleep);
 
-//            Intent test = new Intent(this, TestService.class);
-//            this.startService(test);
+            // //////////////////////////////////////////////////////////////////////////////////////////
         }
 
-
-         //register broadcast receivers ////////////////////////////////////////////////////////////
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        // Step counter service
-        Intent counterStartAlarm = new Intent(this, AlarmReceiver.class);
-        counterStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_START_RECEIVER);
-        PendingIntent counterStartIntent = PendingIntent.getBroadcast(this, 0, counterStartAlarm, 0);
-        setRepeatingAlarm(counterStartIntent, alarmManager, 23, 55, 0);
-
-        Intent counterStopAlarm = new Intent(this, AlarmReceiver.class);
-        counterStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.COUNTER_STOP_RECEIVER);
-        PendingIntent counterStopIntent = PendingIntent.getBroadcast(this, 1, counterStopAlarm, 0);
-        setRepeatingAlarm(counterStopIntent, alarmManager, 0, 05, 0);
-
-        // Sleep detector service
-        Intent sleepStartAlarm = new Intent(this, AlarmManager.class);
-        sleepStartAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_START_RECEIVER);
-        PendingIntent sleepStartIntent = PendingIntent.getBroadcast(this, 2, sleepStartAlarm, 0);
-        setRepeatingAlarm(sleepStartIntent, alarmManager, 18, 0, 0);
-
-        Intent sleepStopAlarm = new Intent(this, AlarmManager.class);
-        sleepStopAlarm.putExtra(AppData.RECEIVER_CODE, AppData.SLEEP_STOP_RECEIVER);
-        PendingIntent sleepStopIntent = PendingIntent.getBroadcast(this, 3, sleepStopAlarm, 0);
-        setRepeatingAlarm(sleepStopIntent, alarmManager, 17, 55, 0);
-
-        // //////////////////////////////////////////////////////////////////////////////////////////
 
         BottomNavigationView bottomNav = findViewById(R.id.navbar_bottom);
         bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -141,5 +149,16 @@ public class MainActivity extends AppCompatActivity {
         calendar.set(Calendar.SECOND, sec);
 
         manager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, intent);
+    }
+
+    public static boolean checkPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

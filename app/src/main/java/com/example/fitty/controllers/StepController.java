@@ -17,7 +17,20 @@ public class StepController {
         ContentValues values = new ContentValues();
 
         // generate yesterday
-        String today = StepCount.getToday();
+        String today = StepCount.getToday(0);
+
+        values.put("step_date", today);
+        values.put("steps", steps);
+
+        long result = db.insert(DatabaseHelper.STEP_TABLE, null, values);
+        return  result;
+    }
+
+    public static long insertCountCustom(DatabaseHelper dbHelper, int steps, int date) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        String today = StepCount.getToday(date);
 
         values.put("step_date", today);
         values.put("steps", steps);

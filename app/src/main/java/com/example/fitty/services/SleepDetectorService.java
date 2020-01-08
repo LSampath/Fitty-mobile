@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -53,6 +54,8 @@ public class SleepDetectorService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("SERVICE", "................................................................Sleep detector started");
+
         resetVariables();
         initialize();
         // Notification
@@ -299,6 +302,7 @@ public class SleepDetectorService extends Service {
     public void onDestroy() {
         sensorManager.unregisterListener(sensorEventListener);
         stopForeground(true);
+        Log.i("SERVICE", "................................................................Sleep detector destroyed");
         super.onDestroy();
     }
 

@@ -47,7 +47,6 @@ public class RunTrackerService extends Service implements LocationListener {
                 && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-
             return START_STICKY;
         }
 

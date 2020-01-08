@@ -100,14 +100,4 @@ public class HomeFragment extends Fragment {
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("new_step_taken"));
     }
 
-    public void startService(View v) {
-        Intent serviceIntent = new Intent(v.getContext(), StepCountService.class);
-        getActivity().startService(serviceIntent);
-    }
-
-    public void stopService(View v) {
-        Intent serviceIntent = new Intent(v.getContext(), StepCountService.class);
-        getActivity().stopService(serviceIntent);
-    }
-
 }

@@ -91,17 +91,6 @@ public class HeartRateFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_heart_rate, container, false);
 
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Request Permission
-            requestPermissions(
-                    new String[]{Manifest.permission.CAMERA},
-                    0);
-        }
-
         SurfaceView preview = (SurfaceView) view.findViewById(R.id.preview);
         previewHolder = preview.getHolder();
         previewHolder.addCallback(surfaceCallback);

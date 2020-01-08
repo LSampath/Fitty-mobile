@@ -1,5 +1,7 @@
 package com.example.fitty.models;
 
+import android.Manifest;
+
 import com.example.fitty.R;
 
 public class AppData {
@@ -30,4 +32,16 @@ public class AppData {
             R.layout.view_run_chart,
             R.layout.view_sleep_chart
     };
+
+    public static final String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.CAMERA,
+            Manifest.permission.WAKE_LOCK,
+            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.INTERNET,
+    };
+
+    public static final double SLEEP_LOWER_BOUND = 7;
+    public static final int STEPS_LOWER_BOUND = 11000;
 }

@@ -34,9 +34,9 @@ public class StepCount {
         return strDate;
     }
 
-    public static String getToday() {
+    public static String getToday(int count) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
+        calendar.add(Calendar.DATE, count);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String date = dateFormat.format(calendar.getTime());
         return date;

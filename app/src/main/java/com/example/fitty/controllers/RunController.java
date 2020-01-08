@@ -9,6 +9,7 @@ import com.example.fitty.adapters.DatabaseHelper;
 import com.example.fitty.models.RunningSession;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class RunController {
 
@@ -19,6 +20,24 @@ public class RunController {
         values.put("start_time", session.getStartTime());
         values.put("end_time", session.getEndTime());
         values.put("distance", session.getDistance());
+
+        long result = db.insert(DatabaseHelper.RUN_TABLE, null, values);
+        return  result;
+    }
+
+    public static long insertSessionCustom(DatabaseHelper dbHelper, double distance, int minutes, int date) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, date);
+        long start_time = calendar.getTimeInMillis();
+        calendar.add(Calendar.MINUTE, minutes);
+        long end_time = calendar.getTimeInMillis();
+
+        values.put("start_time", start_time);
+        values.put("end_time", end_time);
+        values.put("distance", distance);
 
         long result = db.insert(DatabaseHelper.RUN_TABLE, null, values);
         return  result;

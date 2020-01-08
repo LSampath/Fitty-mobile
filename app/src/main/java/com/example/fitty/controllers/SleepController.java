@@ -16,7 +16,20 @@ public class SleepController {
         ContentValues values = new ContentValues();
 
         // generate today
-        String today = SleepHours.getToday();
+        String today = SleepHours.getToday(0);
+
+        values.put("sleep_date", today);
+        values.put("hours", hours);
+
+        long result = db.insert(DatabaseHelper.SLEEP_TABLE, null, values);
+        return  result;
+    }
+
+    public static long insertHoursCustom(DatabaseHelper dbHelper, double hours, int date) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        String today = SleepHours.getToday(date);
 
         values.put("sleep_date", today);
         values.put("hours", hours);

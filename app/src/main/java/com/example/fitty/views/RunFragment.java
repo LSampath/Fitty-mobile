@@ -357,10 +357,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Request Permission
-            requestPermissions(
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    0);
-
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
             return;
         }
 
